@@ -1,0 +1,90 @@
+"use client"
+import { Search, UserCircle, Sun, Moon, Monitor, LogOut, Menu } from 'lucide-react'
+import { Input } from '../ui/input'
+import { Button } from '../ui/button'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
+
+  if (!mounted) return <Button variant="ghost" size="icon" className="w-9 h-9"></Button>
+
+  const cycleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light')
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="w-9 h-9"
+      onClick={cycleTheme}
+      title={`Current theme: ${theme}. Click to change.`}
+    >
+      {theme === 'light' ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-blue-400" />}
+    </Button>
+  )
+}
+
+export function TopNavbar({ onMenuClick }) {
+  const router = useRouter()
+  const [adminName, setAdminName] = useState('Admin User')
+  const [adminRole, setAdminRole] = useState('Super Admin')
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+
+  useEffect(() => {
+    const loadUser = () => {
+      try {
+        const stored = localStorage.getItem('admin_user')
+        if (stored) {
+          const user = JSON.parse(stored)
+          if (user.name) setAdminName(user.name)
+          if (user.role) setAdminRole(user.role)
+        }
+      } catch {
+        // ignore parse errors
+      }
+    }
+    
+    loadUser()
+    window.addEventListener('storage', loadUser)
+    return () => window.removeEventListener('storage', loadUser)
+  }, [])
+
+  // Close dropdown when clicking outside could be added, but for simplicity we rely on clicks inside
+  
+  return (
+    <header className="h-16 md:h-20 border border-[var(--border)]/50 glass-panel flex items-center justify-between px-4 md:px-8 sticky top-2 md:top-4 z-30 transition-all duration-300 rounded-2xl md:rounded-3xl premium-shadow">
+      <div className="flex items-center">
+        <Button variant="ghost" size="icon" onClick={onMenuClick} className="md:hidden mr-2">
+          <Menu className="w-6 h-6 text-[var(--foreground)]" />
+        </Button>
+      </div>
+      <div className="flex items-center space-x-2 md:space-x-3">
+        <ThemeToggle />
+        
+
+        
+        <div className="flex items-center space-x-4 border-l border-[var(--border)]/50 pl-5 ml-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[var(--primary)] to-[var(--primary-hover)] p-0.5 shadow-md">
+              <div className="w-full h-full rounded-full bg-[var(--card)] flex items-center justify-center">
+                <UserCircle className="w-7 h-7 text-[var(--muted-foreground)]" />
+              </div>
+            </div>
+            <div className="flex-col items-start hidden sm:flex pr-2">
+              <span className="text-sm font-bold text-[var(--foreground)] leading-none mb-1">{adminName}</span>
+              <span className="text-[11px] font-bold tracking-wider text-[var(--primary)] uppercase bg-[var(--active-menu)] px-2 py-0.5 rounded-full">{adminRole}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  )
+}
