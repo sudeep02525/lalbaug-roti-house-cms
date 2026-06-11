@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input"
 import { Loader2, CheckCircle2 } from "lucide-react"
 import { useAutoSave } from "@/hooks/useAutoSave"
+import axios from "axios"
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState(null)
@@ -32,11 +33,11 @@ export default function SettingsPage() {
       const freshToken = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
       const freshHeaders = { 'Authorization': `Bearer ${freshToken}`, 'Content-Type': 'application/json' }
       
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
-        headers: freshHeaders
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
+        headers: freshHeaders, validateStatus: () => true
       })
-      if (res.ok) {
-        const data = await res.json()
+      if (res.status === 200 || res.status === 201) {
+        const data = res.data
         setSettings(data.data)
       }
     } catch (err) {
@@ -48,13 +49,7 @@ export default function SettingsPage() {
   }
 
   const saveToApi = useCallback(async (dataToSave) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
-      },
-      body: JSON.stringify({
+    const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
         maxRadiusKm: Number(dataToSave.maxRadiusKm),
         restaurantLat: Number(dataToSave.restaurantLat),
         restaurantLng: Number(dataToSave.restaurantLng),
@@ -70,9 +65,12 @@ export default function SettingsPage() {
         footerDescription: dataToSave.footerDescription,
         facebookUrl: dataToSave.facebookUrl,
         instagramUrl: dataToSave.instagramUrl,
-      }),
+    }, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+      }, validateStatus: () => true
     })
-    if (!res.ok) throw new Error('Failed to save settings')
+    if (res.status !== 200 && res.status !== 201) throw new Error('Failed to save settings')
   }, [])
 
   const { saveState } = useAutoSave(settings, saveToApi)

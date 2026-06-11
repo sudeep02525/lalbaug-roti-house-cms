@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { Upload, Trash2, Video, Loader2 } from "lucide-react"
 import { CustomModal } from "@/components/ui/CustomModal"
+import axios from "axios"
 
 export default function MediaPage() {
   const [videos, setVideos] = useState([])
@@ -18,8 +19,8 @@ export default function MediaPage() {
 
   const fetchVideos = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/videos`)
-      const data = await res.json()
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/videos`, { validateStatus: () => true })
+      const data = res.data
       if (data.success) {
         setVideos(data.data)
       }
@@ -50,14 +51,12 @@ export default function MediaPage() {
 
     try {
       const token = localStorage.getItem("admin_token")
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/videos`, {
-        method: "POST",
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/videos`, formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
+          Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data'
+        }, validateStatus: () => true
       })
-      const data = await res.json()
+      const data = res.data
 
       if (data.success) {
         setTitle("")
@@ -80,13 +79,12 @@ export default function MediaPage() {
     showConfirm("Delete Video", "Are you sure you want to delete this video?", async () => {
       try {
         const token = localStorage.getItem("admin_token")
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/videos/${id}`, {
-          method: "DELETE",
+        const res = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/videos/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
-          },
+          }, validateStatus: () => true
         })
-        const data = await res.json()
+        const data = res.data
 
         if (data.success) {
           setVideos(prev => prev.filter((v) => v._id !== id))

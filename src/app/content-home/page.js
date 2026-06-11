@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input"
 import { Loader2, CheckCircle2 } from 'lucide-react'
 import { useAutoSave } from '@/hooks/useAutoSave'
+import axios from "axios"
 
 export default function HomeContentPage() {
   const [settings, setSettings] = useState(null)
@@ -31,12 +32,12 @@ export default function HomeContentPage() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
-        }
+        }, validateStatus: () => true
       })
-      const data = await res.json()
+      const data = res.data
       if (data.success) {
         setSettings(data.data)
       }
@@ -48,13 +49,7 @@ export default function HomeContentPage() {
   }
 
   const saveToApi = useCallback(async (dataToSave) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
-      },
-      body: JSON.stringify({
+    const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
         heroTitle1: dataToSave.heroTitle1,
         heroTitle2: dataToSave.heroTitle2,
         heroSubtitle: dataToSave.heroSubtitle,
@@ -63,9 +58,12 @@ export default function HomeContentPage() {
         craftDescription: dataToSave.craftDescription,
         craftImage: dataToSave.craftImage,
         craftImages: dataToSave.craftImages
-      }),
+    }, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+      }, validateStatus: () => true
     })
-    if (!res.ok) throw new Error('Failed to save settings')
+    if (res.status !== 200 && res.status !== 201) throw new Error('Failed to save settings')
   }, [])
 
   const { saveState } = useAutoSave(settings, saveToApi)
@@ -86,13 +84,11 @@ export default function HomeContentPage() {
       const formData = new FormData();
       formData.append('image', file);
       
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products/upload`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products/upload`, formData, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }, validateStatus: () => true
       });
       
-      const data = await res.json();
+      const data = res.data;
       if (data.success) {
         if (field === 'craftImages') {
           const currentImages = settings?.craftImages || [];

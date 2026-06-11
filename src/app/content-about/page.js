@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input"
 import { Loader2, CheckCircle2 } from 'lucide-react'
 import { useAutoSave } from '@/hooks/useAutoSave'
+import axios from "axios"
 
 export default function AboutContentPage() {
   const [settings, setSettings] = useState(null)
@@ -15,12 +16,12 @@ export default function AboutContentPage() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
-        }
+        }, validateStatus: () => true
       })
-      const data = await res.json()
+      const data = res.data
       if (data.success) {
         setSettings(data.data)
       }
@@ -32,21 +33,18 @@ export default function AboutContentPage() {
   }
 
   const saveToApi = useCallback(async (dataToSave) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
-      },
-      body: JSON.stringify({
+    const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
         aboutHeroTitle: dataToSave.aboutHeroTitle,
         aboutHeroSubtitle: dataToSave.aboutHeroSubtitle,
         aboutHeroDescription: dataToSave.aboutHeroDescription,
         missionDescription: dataToSave.missionDescription,
         visionDescription: dataToSave.visionDescription
-      }),
+    }, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+      }, validateStatus: () => true
     })
-    if (!res.ok) throw new Error('Failed to save settings')
+    if (res.status !== 200 && res.status !== 201) throw new Error('Failed to save settings')
   }, [])
 
   const { saveState } = useAutoSave(settings, saveToApi)

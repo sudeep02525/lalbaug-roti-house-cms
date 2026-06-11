@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { Plus, Edit, Trash2, Loader2, ListTree, Package, DollarSign, X } from "lucide-react"
 import { CustomModal } from "@/components/ui/CustomModal"
+import axios from "axios"
 
 export default function MenuPage() {
   const [categories, setCategories] = useState([])
@@ -40,12 +41,12 @@ export default function MenuPage() {
       const headers = { Authorization: `Bearer ${token}` }
       
       const [catRes, prodRes, varRes, addonRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/categories`, { headers }).then(r => r.json()),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products`, { headers }).then(r => r.json()),
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/categories`, { headers, validateStatus: () => true }).then(r => r.data),
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products`, { headers, validateStatus: () => true }).then(r => r.data),
         // Wait, there's no GET /variants endpoint in catalog.routes.js that returns all variants directly. 
         // We'd have to fetch product by id to get variants or get menu. 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/menu`, { headers }).then(r => r.json()),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/addons`, { headers }).then(r => r.json())
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/menu`, { headers, validateStatus: () => true }).then(r => r.data),
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/addons`, { headers, validateStatus: () => true }).then(r => r.data)
       ])
 
       if (catRes.success) setCategories(catRes.data)
@@ -91,12 +92,15 @@ export default function MenuPage() {
         ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/categories/${catForm.id}`
         : `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/categories`
       
-      const res = await fetch(url, {
-        method: catForm.id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name: catForm.name, description: catForm.description, active: catForm.active })
+      const method = catForm.id ? "put" : "post"
+      
+      const res = await axios({
+        method, url,
+        headers: { Authorization: `Bearer ${token}` },
+        data: { name: catForm.name, description: catForm.description, active: catForm.active },
+        validateStatus: () => true
       })
-      if (res.ok) {
+      if (res.status === 200 || res.status === 201) {
         setShowCatModal(false)
         fetchData()
       }
@@ -106,8 +110,8 @@ export default function MenuPage() {
   const handleDeleteCat = (id) => {
     showConfirm("Delete Category", "Delete this category and all its products?", async () => {
       const token = localStorage.getItem("admin_token")
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/categories/${id}`, {
-        method: "DELETE", headers: { Authorization: `Bearer ${token}` }
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/categories/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }, validateStatus: () => true
       })
       fetchData()
     });
@@ -126,13 +130,11 @@ export default function MenuPage() {
         const formData = new FormData();
         formData.append('image', imageFile);
         
-        const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products/upload`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData
+        const uploadRes = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products/upload`, formData, {
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }, validateStatus: () => true
         });
         
-        const uploadData = await uploadRes.json();
+        const uploadData = uploadRes.data;
         if (uploadData.success) {
           imageUrl = uploadData.data.imageUrl;
         } else {
@@ -146,16 +148,17 @@ export default function MenuPage() {
         ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products/${prodForm.id}`
         : `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products`
       
-      const res = await fetch(url, {
-        method: prodForm.id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ 
+      const method = prodForm.id ? "put" : "post"
+      const res = await axios({
+        method, url,
+        headers: { Authorization: `Bearer ${token}` },
+        data: { 
           name: prodForm.name, description: prodForm.description, 
           images: imageUrl ? [imageUrl] : [], active: prodForm.active, categoryId: prodForm.categoryId,
           isBestseller: prodForm.isBestseller, isDailyCombo: prodForm.isDailyCombo, addons: prodForm.addons
-        })
+        }, validateStatus: () => true
       })
-      if (res.ok) {
+      if (res.status === 200 || res.status === 201) {
         setShowProdModal(false)
         setImageFile(null)
         fetchData()
@@ -168,8 +171,8 @@ export default function MenuPage() {
   const handleDeleteProd = (id) => {
     showConfirm("Delete Product", "Are you sure you want to delete this product?", async () => {
       const token = localStorage.getItem("admin_token")
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products/${id}`, {
-        method: "DELETE", headers: { Authorization: `Bearer ${token}` }
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }, validateStatus: () => true
       })
       fetchData()
     });
@@ -184,15 +187,16 @@ export default function MenuPage() {
         ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/variants/${varForm.id}`
         : `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/variants`
       
-      const res = await fetch(url, {
-        method: varForm.id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ 
+      const method = varForm.id ? "put" : "post"
+      const res = await axios({
+        method, url,
+        headers: { Authorization: `Bearer ${token}` },
+        data: { 
           name: Number(varForm.minQuantity) === 1 ? "Single" : `Pack of ${varForm.minQuantity}`, price: Number(varForm.price), 
           minQuantity: Number(varForm.minQuantity), active: varForm.active, productId: varForm.productId 
-        })
+        }, validateStatus: () => true
       })
-      if (res.ok) {
+      if (res.status === 200 || res.status === 201) {
         setShowVarModal(false)
         fetchData()
       }
@@ -202,8 +206,8 @@ export default function MenuPage() {
   const handleDeleteVar = (id) => {
     showConfirm("Delete Variant", "Are you sure you want to delete this variant?", async () => {
       const token = localStorage.getItem("admin_token")
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/variants/${id}`, {
-        method: "DELETE", headers: { Authorization: `Bearer ${token}` }
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/variants/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }, validateStatus: () => true
       })
       fetchData()
     });
@@ -222,13 +226,11 @@ export default function MenuPage() {
         const formData = new FormData();
         formData.append('image', addonImageFile);
         
-        const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products/upload`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData
+        const uploadRes = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products/upload`, formData, {
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }, validateStatus: () => true
         });
         
-        const uploadData = await uploadRes.json();
+        const uploadData = uploadRes.data;
         if (uploadData.success) {
           imageUrl = uploadData.data.imageUrl;
         } else {
@@ -242,13 +244,14 @@ export default function MenuPage() {
         ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/addons/${addonForm.id}`
         : `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/addons`
       
-      const res = await fetch(url, {
-        method: addonForm.id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name: addonForm.name, price: Number(addonForm.price), image: imageUrl, active: addonForm.active })
+      const method = addonForm.id ? "put" : "post"
+      const res = await axios({
+        method, url,
+        headers: { Authorization: `Bearer ${token}` },
+        data: { name: addonForm.name, price: Number(addonForm.price), image: imageUrl, active: addonForm.active }, validateStatus: () => true
       })
-      const data = await res.json()
-      if (res.ok) {
+      const data = res.data
+      if (res.status === 200 || res.status === 201) {
         setShowAddonModal(false)
         setAddonImageFile(null)
         fetchData()
@@ -266,8 +269,8 @@ export default function MenuPage() {
   const handleDeleteAddon = (id) => {
     showConfirm("Delete Extra", "Are you sure you want to delete this extra?", async () => {
       const token = localStorage.getItem("admin_token")
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/addons/${id}`, {
-        method: "DELETE", headers: { Authorization: `Bearer ${token}` }
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/addons/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }, validateStatus: () => true
       })
       fetchData()
     });
