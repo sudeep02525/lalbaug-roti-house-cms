@@ -33,7 +33,7 @@ function ThemeToggle() {
 
 export function TopNavbar({ onMenuClick }) {
   const router = useRouter()
-  const [adminName, setAdminName] = useState('Admin User')
+  const [adminName, setAdminName] = useState('CMS User')
   const [adminRole, setAdminRole] = useState('Super Admin')
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)

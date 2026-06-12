@@ -10,7 +10,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null)
   
   // Profile Update State
-  const [name, setName] = useState("Admin User")
+  const [name, setName] = useState("CMS User")
   const [profileLoading, setProfileLoading] = useState(false)
   const [profileMessage, setProfileMessage] = useState("")
   const [profileError, setProfileError] = useState("")
@@ -25,6 +25,12 @@ export default function ProfilePage() {
 
   // Forgot Password State
   const [showForgotModal, setShowForgotModal] = useState(false)
+  const [forgotStep, setForgotStep] = useState(1)
+  const [forgotOtp, setForgotOtp] = useState("")
+  const [forgotNewPassword, setForgotNewPassword] = useState("")
+  const [forgotMessage, setForgotMessage] = useState("")
+  const [forgotError, setForgotError] = useState("")
+  const [forgotLoading, setForgotLoading] = useState(false)
 
   useEffect(() => {
     const adminData = localStorage.getItem("admin_user")
@@ -212,7 +218,7 @@ export default function ProfilePage() {
             </div>
           </CardContent>
           <CardFooter className="border-t border-[var(--border)] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <Button variant="accent" onClick={handleUpdatePassword} disabled={passwordLoading}>
+            <Button onClick={handleUpdatePassword} disabled={passwordLoading}>
               {passwordLoading ? "Updating..." : "Update Password"}
             </Button>
             <button type="button" onClick={() => {
