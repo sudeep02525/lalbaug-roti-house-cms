@@ -36,7 +36,10 @@ export default function ContactContentPage() {
     const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
         restaurantAddress: dataToSave.restaurantAddress,
         restaurantEmail: dataToSave.restaurantEmail,
+        restaurantPhone: dataToSave.restaurantPhone,
         whatsappNumber: dataToSave.whatsappNumber,
+        serviceStartTime: dataToSave.serviceStartTime,
+        serviceEndTime: dataToSave.serviceEndTime,
         footerDescription: dataToSave.footerDescription,
         facebookUrl: dataToSave.facebookUrl,
         instagramUrl: dataToSave.instagramUrl
@@ -99,10 +102,33 @@ export default function ContactContentPage() {
               />
             </div>
             <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Restaurant Phone (Calling)</label>
+              <Input
+                value={settings?.restaurantPhone || ''}
+                onChange={e => handleChange('restaurantPhone', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
               <label className="text-sm font-medium leading-none">WhatsApp Number</label>
               <Input
                 value={settings?.whatsappNumber || ''}
                 onChange={e => handleChange('whatsappNumber', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Opening Time</label>
+              <Input
+                type="time"
+                value={settings?.serviceStartTime || ''}
+                onChange={e => handleChange('serviceStartTime', e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none">Closing Time</label>
+              <Input
+                type="time"
+                value={settings?.serviceEndTime || ''}
+                onChange={e => handleChange('serviceEndTime', e.target.value)}
               />
             </div>
           </div>

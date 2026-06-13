@@ -42,7 +42,7 @@ export default function Dashboard() {
       href: "/content-about",
     },
     {
-      title: "Contact Content",
+      title: "Footer",
       desc: "Edit phone, address, and map",
       icon: <Phone className="w-8 h-8 text-rose-500" />,
       bg: "bg-rose-100 dark:bg-rose-900/30",

@@ -22,7 +22,7 @@ const navItems = [
   { name: 'Videos', href: '/media', icon: Video },
   { name: 'Home Content', href: '/content-home', icon: Home },
   { name: 'About Content', href: '/content-about', icon: Info },
-  { name: 'Contact Content', href: '/content-contact', icon: Phone },
+  { name: 'Footer', href: '/content-contact', icon: Phone },
   { name: 'Settings', href: '/settings', icon: Settings },
   { name: 'Profile', href: '/profile', icon: User },
 ]
