@@ -37,7 +37,7 @@ export default function MenuPage() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       const headers = { Authorization: `Bearer ${token}` }
       
       const [catRes, prodRes, varRes, addonRes] = await Promise.all([
@@ -77,7 +77,7 @@ export default function MenuPage() {
 
   const getImageUrl = (url) => {
     if (!url) return "";
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.lalbaugrotihouse.com';
     if (url.startsWith('/uploads')) return `${apiUrl}${url}`;
     if (url.startsWith('/images')) return `${apiUrl}${url}`;
     return url;
@@ -87,7 +87,7 @@ export default function MenuPage() {
   const handleSaveCat = async (e) => {
     e.preventDefault()
     try {
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       const url = catForm.id 
         ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/categories/${catForm.id}`
         : `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/categories`
@@ -109,7 +109,7 @@ export default function MenuPage() {
 
   const handleDeleteCat = (id) => {
     showConfirm("Delete Category", "Delete this category and all its products?", async () => {
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/categories/${id}`, {
         headers: { Authorization: `Bearer ${token}` }, validateStatus: () => true
       })
@@ -122,7 +122,7 @@ export default function MenuPage() {
     e.preventDefault()
     try {
       setLoading(true)
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       
       let imageUrl = prodForm.image;
       
@@ -170,7 +170,7 @@ export default function MenuPage() {
 
   const handleDeleteProd = (id) => {
     showConfirm("Delete Product", "Are you sure you want to delete this product?", async () => {
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` }, validateStatus: () => true
       })
@@ -182,7 +182,7 @@ export default function MenuPage() {
   const handleSaveVar = async (e) => {
     e.preventDefault()
     try {
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       const url = varForm.id 
         ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/variants/${varForm.id}`
         : `${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/variants`
@@ -205,7 +205,7 @@ export default function MenuPage() {
 
   const handleDeleteVar = (id) => {
     showConfirm("Delete Variant", "Are you sure you want to delete this variant?", async () => {
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/variants/${id}`, {
         headers: { Authorization: `Bearer ${token}` }, validateStatus: () => true
       })
@@ -218,7 +218,7 @@ export default function MenuPage() {
     e.preventDefault()
     try {
       setLoading(true)
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       
       let imageUrl = addonForm.image;
       
@@ -268,7 +268,7 @@ export default function MenuPage() {
 
   const handleDeleteAddon = (id) => {
     showConfirm("Delete Extra", "Are you sure you want to delete this extra?", async () => {
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/catalog/addons/${id}`, {
         headers: { Authorization: `Bearer ${token}` }, validateStatus: () => true
       })

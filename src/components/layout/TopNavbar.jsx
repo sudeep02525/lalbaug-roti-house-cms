@@ -34,14 +34,14 @@ function ThemeToggle() {
 export function TopNavbar({ onMenuClick }) {
   const router = useRouter()
   const [adminName, setAdminName] = useState('CMS User')
-  const [adminRole, setAdminRole] = useState('Super Admin')
+  const [adminRole, setAdminRole] = useState('CMS')
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   useEffect(() => {
     const loadUser = () => {
       try {
-        const stored = localStorage.getItem('admin_user')
+        const stored = localStorage.getItem('cms_user')
         if (stored) {
           const user = JSON.parse(stored)
           if (user.name) setAdminName(user.name)

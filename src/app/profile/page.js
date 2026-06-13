@@ -33,14 +33,14 @@ export default function ProfilePage() {
   const [forgotLoading, setForgotLoading] = useState(false)
 
   useEffect(() => {
-    const adminData = localStorage.getItem("admin_user")
+    const adminData = localStorage.getItem("cms_user")
     if (adminData && adminData !== "undefined") {
       try {
         const parsed = JSON.parse(adminData)
         setUser(parsed)
         if (parsed.name) setName(parsed.name)
       } catch (error) {
-        console.error("Failed to parse admin_user data:", error)
+        console.error("Failed to parse cms_user data:", error)
       }
     }
   }, [])
@@ -51,8 +51,8 @@ export default function ProfilePage() {
     setProfileLoading(true)
     
     try {
-      const token = localStorage.getItem("admin_token")
-      const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/profile`, { name }, {
+      const token = localStorage.getItem("cms_token")
+      const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/cms/profile`, { name }, {
         headers: { 
           "Authorization": `Bearer ${token}`
         }, validateStatus: () => true
@@ -65,7 +65,7 @@ export default function ProfilePage() {
       // Update local storage
       const updatedUser = { ...user, name: data.data.name }
       setUser(updatedUser)
-      localStorage.setItem("admin_user", JSON.stringify(updatedUser))
+      localStorage.setItem("cms_user", JSON.stringify(updatedUser))
       
       // We could use context or an event to notify TopNavbar, but typically 
       // the user might have to refresh, or we can dispatch a storage event
@@ -95,8 +95,8 @@ export default function ProfilePage() {
     setPasswordLoading(true)
     
     try {
-      const token = localStorage.getItem("admin_token")
-      const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/password`, { currentPassword, newPassword }, {
+      const token = localStorage.getItem("cms_token")
+      const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/cms/password`, { currentPassword, newPassword }, {
         headers: { 
           "Authorization": `Bearer ${token}`
         }, validateStatus: () => true

@@ -18,7 +18,7 @@ export default function AboutContentPage() {
     try {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('cms_token')}`
         }, validateStatus: () => true
       })
       const data = res.data
@@ -41,7 +41,7 @@ export default function AboutContentPage() {
         visionDescription: dataToSave.visionDescription
     }, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+        'Authorization': `Bearer ${localStorage.getItem('cms_token')}`
       }, validateStatus: () => true
     })
     if (res.status !== 200 && res.status !== 201) throw new Error('Failed to save settings')

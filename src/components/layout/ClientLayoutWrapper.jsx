@@ -20,7 +20,7 @@ export function ClientLayoutWrapper({ children }) {
       return
     }
 
-    const token = localStorage.getItem('admin_token')
+    const token = localStorage.getItem('cms_token')
     if (!token) {
       router.push('/login')
     } else {
@@ -34,8 +34,8 @@ export function ClientLayoutWrapper({ children }) {
         try {
           const response = await originalFetch(...args);
           if (response.status === 401) {
-            localStorage.removeItem('admin_token');
-            localStorage.removeItem('admin_user');
+            localStorage.removeItem('cms_token');
+            localStorage.removeItem('cms_user');
             // Force reload to login to clear any state
             window.location.href = '/login';
           }

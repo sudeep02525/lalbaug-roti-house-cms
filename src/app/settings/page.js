@@ -17,7 +17,7 @@ export default function SettingsPage() {
 
   const getImageUrl = (url) => {
     if (!url) return "";
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.lalbaugrotihouse.com';
     if (url.startsWith('/uploads')) return `${apiUrl}${url}`;
     if (url.startsWith('/images')) return `${apiUrl}${url}`;
     return url;
@@ -30,7 +30,7 @@ export default function SettingsPage() {
   const fetchSettings = async () => {
     setLoading(true)
     try {
-      const freshToken = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
+      const freshToken = typeof window !== 'undefined' ? localStorage.getItem('cms_token') : null
       const freshHeaders = { 'Authorization': `Bearer ${freshToken}`, 'Content-Type': 'application/json' }
       
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
@@ -67,7 +67,7 @@ export default function SettingsPage() {
         instagramUrl: dataToSave.instagramUrl,
     }, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+        'Authorization': `Bearer ${localStorage.getItem('cms_token')}`
       }, validateStatus: () => true
     })
     if (res.status !== 200 && res.status !== 201) throw new Error('Failed to save settings')

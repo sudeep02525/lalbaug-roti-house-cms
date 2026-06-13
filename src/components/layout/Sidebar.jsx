@@ -32,8 +32,8 @@ export function Sidebar({ isOpen, onClose }) {
   const router = useRouter()
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token')
-    localStorage.removeItem('admin_user')
+    localStorage.removeItem('cms_token')
+    localStorage.removeItem('cms_user')
     router.push('/login')
   }
 

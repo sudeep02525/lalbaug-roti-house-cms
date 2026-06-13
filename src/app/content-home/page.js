@@ -20,7 +20,7 @@ export default function HomeContentPage() {
 
   const getImageUrl = (url) => {
     if (!url) return "";
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.lalbaugrotihouse.com';
     if (url.startsWith('/uploads')) return `${apiUrl}${url}`;
     if (url.startsWith('/images')) return `${apiUrl}${url}`;
     return url;
@@ -34,7 +34,7 @@ export default function HomeContentPage() {
     try {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/settings`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('cms_token')}`
         }, validateStatus: () => true
       })
       const data = res.data
@@ -60,7 +60,7 @@ export default function HomeContentPage() {
         craftImages: dataToSave.craftImages
     }, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+        'Authorization': `Bearer ${localStorage.getItem('cms_token')}`
       }, validateStatus: () => true
     })
     if (res.status !== 200 && res.status !== 201) throw new Error('Failed to save settings')
@@ -80,7 +80,7 @@ export default function HomeContentPage() {
     if (field === 'craftImage') setUploadingCraft(true);
     
     try {
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       const formData = new FormData();
       formData.append('image', file);
       

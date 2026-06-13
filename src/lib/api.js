@@ -3,7 +3,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_A
 
 function getToken() {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem('admin_token')
+  return localStorage.getItem('cms_token')
 }
 
 async function request(path, options = {}) {
@@ -25,8 +25,8 @@ async function request(path, options = {}) {
 }
 
 // Auth
-export const adminLogin = (email, password) =>
-  request('/admin/login', { method: 'POST', body: JSON.stringify({ email, password }) })
+export const cmsLogin = (email, password) =>
+  request('/cms/login', { method: 'POST', body: JSON.stringify({ email, password }) })
 
 // Dashboard
 export const getDashboard = () => request('/admin/dashboard')

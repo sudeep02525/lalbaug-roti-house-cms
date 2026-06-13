@@ -53,7 +53,7 @@ export default function CMSLoginPage() {
     setForgotLoading(true)
 
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/forgot-password`, { email: forgotEmail }, { validateStatus: () => true })
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/cms/forgot-password`, { email: forgotEmail }, { validateStatus: () => true })
       const data = res.data
       if (res.status !== 200 && res.status !== 201) throw new Error(data.message || "Failed to send OTP")
       setForgotMessage(data.message || "OTP sent to your email")
@@ -72,7 +72,7 @@ export default function CMSLoginPage() {
     setForgotLoading(true)
 
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/reset-password`, { email: forgotEmail, otp, newPassword }, { validateStatus: () => true })
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/cms/reset-password`, { email: forgotEmail, otp, newPassword }, { validateStatus: () => true })
       const data = res.data
       if (res.status !== 200 && res.status !== 201) throw new Error(data.message || "Failed to reset password")
       
@@ -97,7 +97,7 @@ export default function CMSLoginPage() {
     setLoading(true)
 
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/login`, { email, password }, { validateStatus: () => true })
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/cms/login`, { email, password }, { validateStatus: () => true })
 
       const data = res.data
 
@@ -106,11 +106,11 @@ export default function CMSLoginPage() {
         return
       }
 
-      localStorage.setItem("admin_token", data.data.token)
+      localStorage.setItem("cms_token", data.data.token)
       
       // Fix: data.data itself contains the user info (_id, name, email, role), not data.data.admin
       const { token, ...userData } = data.data
-      localStorage.setItem("admin_user", JSON.stringify(userData))
+      localStorage.setItem("cms_user", JSON.stringify(userData))
       
       router.push("/")
     } catch (err) {
@@ -189,7 +189,7 @@ export default function CMSLoginPage() {
               <label className="text-sm font-semibold text-[var(--foreground)]">Email Address</label>
               <input
                 type="email"
-                placeholder="admin@lalbaugrotihouse.com"
+                placeholder="cms@lalbaugrotihouse.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

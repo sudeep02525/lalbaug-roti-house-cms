@@ -50,7 +50,7 @@ export default function MediaPage() {
     formData.append("video", file)
 
     try {
-      const token = localStorage.getItem("admin_token")
+      const token = localStorage.getItem("cms_token")
       const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/videos`, formData, {
         headers: {
           Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data'
@@ -78,7 +78,7 @@ export default function MediaPage() {
   const handleDelete = (id) => {
     showConfirm("Delete Video", "Are you sure you want to delete this video?", async () => {
       try {
-        const token = localStorage.getItem("admin_token")
+        const token = localStorage.getItem("cms_token")
         const res = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/videos/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
